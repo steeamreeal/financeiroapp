@@ -3,6 +3,7 @@ import { Wallet } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { SidebarNav } from "@/components/dashboard/sidebar-nav";
 import { UserMenu } from "@/components/dashboard/user-menu";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Toaster } from "@/components/ui/sonner";
 
 export default async function DashboardLayout({
@@ -30,7 +31,10 @@ export default async function DashboardLayout({
             </div>
             <SidebarNav className="flex-row" />
           </div>
-          <UserMenu email={user.email ?? ""} />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <UserMenu email={user.email ?? ""} />
+          </div>
         </div>
       </header>
 

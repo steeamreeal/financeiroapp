@@ -17,6 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const features = [
   {
@@ -75,6 +76,7 @@ export default function Home() {
             Finanças Pessoais
           </div>
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <Button variant="ghost" render={<Link href="/login">Entrar</Link>} />
             <Button render={<Link href="/cadastro">Criar conta</Link>} />
           </div>

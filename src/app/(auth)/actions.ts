@@ -37,7 +37,7 @@ export async function signup(formData: FormData) {
   }
 
   if (!data.session) {
-    redirect("/login?message=Verifique seu e-mail para confirmar o cadastro.");
+    redirect(`/confirme-seu-email?email=${encodeURIComponent(email)}`);
   }
 
   redirect("/dashboard");

@@ -1,6 +1,7 @@
-import { TrendingUp, TrendingDown, Wallet } from "lucide-react";
+import Link from "next/link";
+import { TrendingUp, TrendingDown, Wallet, ArrowRight } from "lucide-react";
 import { getTransactions } from "@/lib/data";
-import { formatCurrency, MONTHS_PT } from "@/lib/format";
+import { formatCurrency, formatDate, MONTHS_PT } from "@/lib/format";
 import {
   Card,
   CardContent,
@@ -8,6 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { PeriodSelect } from "@/components/dashboard/period-select";
 import { CategoryPieChart } from "@/components/dashboard/category-pie-chart";
 
@@ -99,17 +102,78 @@ export default async function DashboardPage({
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Despesas por categoria</CardTitle>
-          <CardDescription>
-            Distribuição dos gastos no período selecionado
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <CategoryPieChart data={chartData} />
-        </CardContent>
-      </Card>
+      <div className="grid gap-4 lg:grid-cols-5">
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Despesas por categoria</CardTitle>
+            <CardDescription>
+              Distribuição dos gastos no período selecionado
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CategoryPieChart data={chartData} />
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-3">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <div>
+              <CardTitle>Receitas e despesas lançadas</CardTitle>
+              <CardDescription>
+                Tudo o que foi adicionado em {MONTHS_PT[month - 1].toLowerCase()}
+              </CardDescription>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              render={
+                <Link href="/dashboard/transacoes">
+                  Ver todas
+                  <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                </Link>
+              }
+            />
+          </CardHeader>
+          <CardContent>
+            {transactions.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                Nenhuma receita ou despesa lançada neste período.
+              </p>
+            ) : (
+              <ul className="max-h-[420px] divide-y divide-border overflow-y-auto">
+                {transactions.map((transaction) => (
+                  <li
+                    key={transaction.id}
+                    className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate font-medium">
+                        {transaction.description}
+                      </p>
+                      <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                        <span>{formatDate(transaction.date)}</span>
+                        <Badge variant="secondary" className="text-xs">
+                          {transaction.category?.name ?? "Outros"}
+                        </Badge>
+                      </div>
+                    </div>
+                    <span
+                      className={`shrink-0 font-medium ${
+                        transaction.type === "receita"
+                          ? "text-emerald-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      {transaction.type === "receita" ? "+" : "-"}
+                      {formatCurrency(transaction.amount)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

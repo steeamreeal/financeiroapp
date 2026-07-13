@@ -4,15 +4,15 @@ import { Pie, PieChart, Cell, ResponsiveContainer, Tooltip, Legend } from "recha
 import { formatCurrency } from "@/lib/format";
 
 const COLORS = [
-  "#2563eb",
-  "#16a34a",
-  "#f59e0b",
-  "#dc2626",
-  "#7c3aed",
-  "#0891b2",
-  "#db2777",
-  "#65a30d",
-  "#78716c",
+  "#1f7a5c",
+  "#e8a13d",
+  "#d9553a",
+  "#3d7ea6",
+  "#a25dc2",
+  "#c2914f",
+  "#4f9d69",
+  "#c2577a",
+  "#7d8a99",
 ];
 
 export interface CategorySlice {

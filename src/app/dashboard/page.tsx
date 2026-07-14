@@ -150,12 +150,24 @@ export default async function DashboardPage({
                       <p className="truncate font-medium">
                         {transaction.description}
                       </p>
-                      <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                      <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                         <span>{formatDate(transaction.date)}</span>
                         <Badge variant="secondary" className="text-xs">
                           {transaction.category?.name ?? "Outros"}
                         </Badge>
+                        {transaction.source !== "manual" && (
+                          <Badge variant="outline" className="text-xs">
+                            {transaction.source === "csv" && "CSV"}
+                            {transaction.source === "ofx" && "OFX"}
+                            {transaction.source === "ocr" && "Comprovante"}
+                          </Badge>
+                        )}
                       </div>
+                      {transaction.notes && (
+                        <p className="mt-1 truncate text-xs text-muted-foreground/80 italic">
+                          {transaction.notes}
+                        </p>
+                      )}
                     </div>
                     <span
                       className={`shrink-0 font-medium ${

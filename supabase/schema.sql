@@ -39,6 +39,8 @@ create table if not exists transactions (
   date date not null,
   type transaction_type not null,
   category_id uuid references categories(id),
+  notes text,
+  source text not null default 'manual',
   created_at timestamptz not null default now()
 );
 

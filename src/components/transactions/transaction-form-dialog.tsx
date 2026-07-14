@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -60,6 +61,7 @@ export function TransactionFormDialog({
   const [categoryId, setCategoryId] = useState(
     transaction?.category_id ?? ""
   );
+  const [notes, setNotes] = useState(transaction?.notes ?? "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -69,6 +71,7 @@ export function TransactionFormDialog({
       setAmount(transaction ? String(transaction.amount) : "");
       setDate(transaction?.date ?? new Date().toISOString().slice(0, 10));
       setCategoryId(transaction?.category_id ?? "");
+      setNotes(transaction?.notes ?? "");
     }
   }, [open, transaction]);
 
@@ -84,6 +87,7 @@ export function TransactionFormDialog({
       date,
       type,
       category_id: categoryId || null,
+      notes: notes.trim() || null,
     };
 
     try {
@@ -185,6 +189,17 @@ export function TransactionFormDialog({
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="notes">Observações (opcional)</Label>
+            <Textarea
+              id="notes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Detalhes extras: forma de pagamento, parcelas, contexto..."
+              rows={3}
+            />
           </div>
 
           <DialogFooter>

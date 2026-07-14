@@ -79,8 +79,16 @@ export function TransactionsTable({
                 <TableCell className="whitespace-nowrap">
                   {formatDate(transaction.date)}
                 </TableCell>
-                <TableCell className="max-w-[200px] truncate">
-                  {transaction.description}
+                <TableCell className="max-w-[220px]">
+                  <p className="truncate">{transaction.description}</p>
+                  {transaction.notes && (
+                    <p
+                      className="truncate text-xs text-muted-foreground italic"
+                      title={transaction.notes}
+                    >
+                      {transaction.notes}
+                    </p>
+                  )}
                 </TableCell>
                 <TableCell>
                   <Badge variant="secondary">

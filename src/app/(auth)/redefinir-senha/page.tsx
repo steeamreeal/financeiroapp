@@ -1,6 +1,5 @@
-import Link from "next/link";
-import { Wallet } from "lucide-react";
-import { login } from "../actions";
+import { KeyRound } from "lucide-react";
+import { resetPassword } from "../actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,10 +11,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export default async function LoginPage({
+export default async function RedefinirSenhaPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; message?: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const params = await searchParams;
 
@@ -31,66 +30,38 @@ export default async function LoginPage({
       <div className="w-full max-w-sm space-y-6">
         <div className="flex flex-col items-center gap-2">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            <Wallet className="h-6 w-6" />
+            <KeyRound className="h-6 w-6" />
           </div>
           <h1 className="text-xl font-semibold">Finanças Pessoais</h1>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Entrar</CardTitle>
-            <CardDescription>
-              Acesse sua conta para gerenciar suas finanças.
-            </CardDescription>
+            <CardTitle>Redefinir senha</CardTitle>
+            <CardDescription>Escolha uma nova senha para sua conta.</CardDescription>
           </CardHeader>
           <CardContent>
-            <form action={login} className="space-y-4">
+            <form action={resetPassword} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">E-mail</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="voce@email.com"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Senha</Label>
+                <Label htmlFor="password">Nova senha</Label>
                 <Input
                   id="password"
                   name="password"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder="Mínimo 6 caracteres"
                   required
                   minLength={6}
                 />
-                <Link
-                  href="/esqueci-senha"
-                  className="inline-block text-xs font-medium text-primary underline-offset-4 hover:underline"
-                >
-                  Esqueceu sua senha?
-                </Link>
               </div>
 
               {params.error && (
                 <p className="text-sm text-destructive">{params.error}</p>
               )}
-              {params.message && (
-                <p className="text-sm text-emerald-600">{params.message}</p>
-              )}
 
               <Button type="submit" className="w-full">
-                Entrar
+                Salvar nova senha
               </Button>
             </form>
-
-            <p className="mt-4 text-center text-sm text-muted-foreground">
-              Ainda não tem conta?{" "}
-              <Link href="/cadastro" className="font-medium text-primary underline-offset-4 hover:underline">
-                Cadastre-se
-              </Link>
-            </p>
           </CardContent>
         </Card>
       </div>

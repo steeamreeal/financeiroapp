@@ -31,12 +31,21 @@ export async function updateSession(request: NextRequest) {
 
   const isAuthRoute =
     request.nextUrl.pathname.startsWith("/login") ||
-    request.nextUrl.pathname.startsWith("/cadastro");
+    request.nextUrl.pathname.startsWith("/cadastro") ||
+    request.nextUrl.pathname.startsWith("/esqueci-senha");
+  const isResetPasswordRoute =
+    request.nextUrl.pathname.startsWith("/redefinir-senha");
   const isProtectedRoute = request.nextUrl.pathname.startsWith("/dashboard");
 
   if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
+
+  if (!user && isResetPasswordRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/esqueci-senha";
     return NextResponse.redirect(url);
   }
 

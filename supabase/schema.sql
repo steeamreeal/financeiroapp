@@ -51,23 +51,28 @@ create index if not exists transactions_date_idx on transactions(date);
 alter table transactions enable row level security;
 alter table categories enable row level security;
 
+drop policy if exists "Usuários veem apenas suas transações" on transactions;
 create policy "Usuários veem apenas suas transações"
   on transactions for select
   using (auth.uid() = user_id);
 
+drop policy if exists "Usuários inserem apenas suas transações" on transactions;
 create policy "Usuários inserem apenas suas transações"
   on transactions for insert
   with check (auth.uid() = user_id);
 
+drop policy if exists "Usuários atualizam apenas suas transações" on transactions;
 create policy "Usuários atualizam apenas suas transações"
   on transactions for update
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
+drop policy if exists "Usuários excluem apenas suas transações" on transactions;
 create policy "Usuários excluem apenas suas transações"
   on transactions for delete
   using (auth.uid() = user_id);
 
+drop policy if exists "Categorias são visíveis para todos autenticados" on categories;
 create policy "Categorias são visíveis para todos autenticados"
   on categories for select
   to authenticated

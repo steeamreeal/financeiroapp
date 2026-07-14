@@ -13,9 +13,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { parseStatementFile } from "@/lib/import/parse-statement";
+import { fileToBase64 } from "@/lib/import/file-to-base64";
 import { importTransactions } from "@/app/dashboard/actions";
+import { extractTransactionsFromDocument } from "@/app/dashboard/ocr-actions";
 import { ImportPreviewTable } from "./import-preview-table";
-import type { Category, ParsedTransaction } from "@/lib/types";
+import type {
+  Category,
+  ParsedTransaction,
+  TransactionSource,
+} from "@/lib/types";
 
 export function StatementImportTab({ categories }: { categories: Category[] }) {
   const router = useRouter();
@@ -23,15 +29,18 @@ export function StatementImportTab({ categories }: { categories: Category[] }) {
   const [transactions, setTransactions] = useState<ParsedTransaction[]>([]);
   const [categoryId, setCategoryId] = useState<string>("");
   const [isImporting, setIsImporting] = useState(false);
+  const [isReading, setIsReading] = useState(false);
   const [warnings, setWarnings] = useState<string[]>([]);
+  const [source, setSource] = useState<TransactionSource>("csv");
 
-  function handleFile(file: File) {
+  function handleTextFile(file: File) {
     const reader = new FileReader();
     reader.onload = () => {
       const content = reader.result as string;
       const result = parseStatementFile(file.name, content);
       setTransactions(result.transactions);
       setWarnings(result.warnings);
+      setSource(file.name.toLowerCase().endsWith(".ofx") ? "ofx" : "csv");
       if (result.transactions.length > 0) {
         toast.success(
           `${result.transactions.length} lançamento(s) encontrados. Revise antes de importar.`
@@ -41,13 +50,51 @@ export function StatementImportTab({ categories }: { categories: Category[] }) {
     reader.readAsText(file, "utf-8");
   }
 
+  async function handlePdfFile(file: File) {
+    setIsReading(true);
+    setTransactions([]);
+    setWarnings([]);
+    try {
+      const { data, mediaType } = await fileToBase64(file);
+      const result = await extractTransactionsFromDocument(
+        data,
+        mediaType,
+        file.name
+      );
+      setSource("ocr");
+      if (result.warning) {
+        setWarnings([result.warning]);
+      }
+      if (result.transactions.length > 0) {
+        setTransactions(result.transactions);
+        toast.success(
+          `${result.transactions.length} lançamento(s) reconhecidos. Revise antes de importar.`
+        );
+      }
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao ler o PDF do extrato."
+      );
+    } finally {
+      setIsReading(false);
+    }
+  }
+
+  function handleFile(file: File) {
+    if (file.name.toLowerCase().endsWith(".pdf")) {
+      handlePdfFile(file);
+    } else {
+      handleTextFile(file);
+    }
+  }
+
   async function handleImport() {
     setIsImporting(true);
     try {
       const result = await importTransactions(
         transactions,
         categoryId || null,
-        "csv"
+        source
       );
       toast.success(`${result.count} transações importadas com sucesso.`);
       setTransactions([]);
@@ -73,21 +120,32 @@ export function StatementImportTab({ categories }: { categories: Category[] }) {
           if (file) handleFile(file);
         }}
       >
-        <FileUp className="h-8 w-8 text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">
-          Arraste um arquivo .csv ou .ofx do seu banco aqui, ou
-        </p>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => inputRef.current?.click()}
-        >
-          Selecionar arquivo
-        </Button>
+        {isReading ? (
+          <>
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-sm text-muted-foreground">
+              Lendo o extrato em PDF...
+            </p>
+          </>
+        ) : (
+          <>
+            <FileUp className="h-8 w-8 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">
+              Arraste um arquivo .csv, .ofx ou .pdf do seu banco aqui, ou
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => inputRef.current?.click()}
+            >
+              Selecionar arquivo
+            </Button>
+          </>
+        )}
         <input
           ref={inputRef}
           type="file"
-          accept=".csv,.ofx,text/csv"
+          accept=".csv,.ofx,.pdf,text/csv,application/pdf"
           className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];

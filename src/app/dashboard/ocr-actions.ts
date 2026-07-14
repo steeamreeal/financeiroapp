@@ -46,7 +46,7 @@ export async function extractTransactionsFromDocument(
 
   const response = await client.messages.create({
     model: "claude-opus-4-8",
-    max_tokens: 4096,
+    max_tokens: 16000,
     output_config: {
       format: {
         type: "json_schema",
@@ -84,7 +84,7 @@ export async function extractTransactionsFromDocument(
           documentBlock,
           {
             type: "text",
-            text: `Este é um comprovante de pagamento, nota fiscal ou extrato bancário (arquivo: ${filename}). Extraia todas as transações financeiras visíveis (valores que entraram = receita, valores que saíram = despesa). Para cada transação, retorne descrição curta e clara, valor (sempre positivo), data no formato YYYY-MM-DD (use o ano atual se não estiver explícito) e o tipo. Se houver informações extras relevantes (forma de pagamento, número do documento, parcelas), inclua em "notes". Se não conseguir identificar nenhuma transação, retorne uma lista vazia.`,
+            text: `Este é um comprovante de pagamento, nota fiscal ou extrato bancário (arquivo: ${filename}), podendo conter uma ou várias páginas com várias transações (como um extrato bancário em PDF). Extraia TODAS as transações financeiras visíveis, linha por linha (valores que entraram = receita, valores que saíram = despesa). Para cada transação, retorne descrição curta e clara (nome do estabelecimento, origem/destino da transferência, etc.), valor (sempre positivo), data no formato YYYY-MM-DD (use o ano atual se não estiver explícito) e o tipo. Se houver informações extras relevantes (forma de pagamento, número do documento, parcelas, saldo), inclua em "notes". Não pule nenhuma linha de transação, mesmo que o documento tenha muitas. Se não conseguir identificar nenhuma transação, retorne uma lista vazia.`,
           },
         ],
       },
